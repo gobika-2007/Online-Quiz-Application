@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./App.css";
 
@@ -134,6 +134,24 @@ function Quiz() {
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [timeLeft, setTimeLeft] = useState(300);
 
+  const submitQuiz = useCallback(() => {
+  let score = 0;
+
+  questions.forEach((q, index) => {
+    if (selectedAnswers[index] === q.answer) {
+      score++;
+    }
+  });
+
+  navigate("/result", {
+    state: {
+      score,
+      total: questions.length,
+      category
+    }
+  });
+}, [selectedAnswers, questions, navigate, category]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -147,7 +165,7 @@ function Quiz() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [submitQuiz]);
 
   const handleAnswer = (option) => {
     const newAnswers = [...selectedAnswers];
@@ -155,23 +173,7 @@ function Quiz() {
     setSelectedAnswers(newAnswers);
   };
 
-  const submitQuiz = () => {
-    let score = 0;
 
-    questions.forEach((q, index) => {
-      if (selectedAnswers[index] === q.answer) {
-        score++;
-      }
-    });
-
-    navigate("/result", {
-      state: {
-        score,
-        total: questions.length,
-        category
-      }
-    });
-  };
 
   return (
     <div className="container">
